@@ -1,7 +1,12 @@
+FROM maven:3.8-openjdk-21-slim AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package
 
+# Run stage
 FROM openjdk:21-jdk-slim
 WORKDIR /app
-CMD ["mvn","clean","package"]
-COPY /target/maze_final-1.0-SNAPSHOT.jar /app/server.jar
+COPY --from=build /app/target/*.jar server.jar
 EXPOSE 5000
 CMD ["java", "-jar", "server.jar"]
