@@ -1,3 +1,4 @@
+/*
 package org.algorithm.maze.impl.prims_algorithm;
 
 import javafx.application.Application;
@@ -72,7 +73,9 @@ public class PrimMazeVisualizer extends Application {
             List<Node> path = paths.get(i);
             System.out.print("Path nb:"+i);
             for (Node node : path) {
-                /*System.out.print("(" + node.getRow() + "," + node.getColumn() + ")");*/
+                */
+/*System.out.print("(" + node.getRow() + "," + node.getColumn() + ")");*//*
+
                 System.out.print(node.getValue());
             }
            System.out.println(" ");
@@ -131,4 +134,4 @@ public class PrimMazeVisualizer extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+}*/

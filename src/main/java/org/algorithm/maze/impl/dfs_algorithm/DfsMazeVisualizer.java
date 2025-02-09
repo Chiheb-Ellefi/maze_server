@@ -1,3 +1,4 @@
+/*
 package org.algorithm.maze.impl.dfs_algorithm;
 
 import javafx.application.Application;
@@ -113,4 +114,4 @@ public class DfsMazeVisualizer extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+}*/

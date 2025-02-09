@@ -1,3 +1,4 @@
+/*
 package org.algorithm.maze.impl;
 
 import javafx.application.Application;
@@ -134,4 +135,4 @@ public class MazeVisualizer extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+}*/
