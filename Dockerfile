@@ -4,6 +4,10 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package
+# Verify the manifest
+RUN echo "Verifying manifest..." && \
+    jar tvf target/*.jar | grep MANIFEST && \
+    unzip -p target/*.jar META-INF/MANIFEST.MF
 
 # Run stage
 FROM eclipse-temurin:21-jdk-jammy
