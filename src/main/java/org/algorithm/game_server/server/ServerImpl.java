@@ -20,15 +20,15 @@ public class ServerImpl implements Server {
     private int nbRow;
     private int nbCol;
     private final Logger logger;
-    private ExecutorService executorService; // Thread pool for handling clients
+    private ExecutorService executorService;
 
     public ServerImpl(int port) {
         this.port = port;
         this.queue = new ConcurrentLinkedQueue<>();
         this.nbRow = 5;
-        this.nbCol = 5;
+        this.nbCol = 10;
         this.logger = Logger.getLogger(ServerImpl.class.getName());
-        this.executorService = Executors.newCachedThreadPool(); // Create a thread pool
+        this.executorService = Executors.newCachedThreadPool();
     }
 
     public void start() throws IOException {

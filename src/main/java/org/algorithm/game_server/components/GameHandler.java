@@ -30,7 +30,7 @@ public class GameHandler {
     Set<String> firstFoundWords;
     Set<String> secondFoundWords;
     int secondPlayerScore;
-    private static final int GAME_DURATION_SECONDS = 15000;
+    private static final int GAME_DURATION_SECONDS = 20000;
     private final BlockingQueue<String> firstPlayerMessages = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> secondPlayerMessages = new LinkedBlockingQueue<>();
     private final BlockingQueue<Node> firstPlayerNodes = new LinkedBlockingQueue<>();
@@ -41,11 +41,12 @@ public class GameHandler {
         this.mazeGen=new DfsAlgorithm(nbRow,nbCol);
         this.mazeGen.setStartAndEnd();
         this.mazeGen.generateMaze();
+        this.mazeGen.createLoops();
         this.logger = Logger.getLogger(ServerImpl.class.getName());
         this.firstPath=new Stack<>();
         this.secondPath=new Stack<>();
-        this.firstPath.push(mazeGen.getStart());
-        this.secondPath.push(mazeGen.getStart());
+        this.firstPath.push(mazeGen.getMaze()[mazeGen.getStart().getRow()][mazeGen.getStart().getColumn()]);
+        this.secondPath.push(mazeGen.getMaze()[mazeGen.getStart().getRow()][mazeGen.getStart().getColumn()]);
         this.mazeSolver=new DijkstraAlgorithm();
         this.firstPlayerScore=0;
         this.secondPlayerScore=0;
@@ -83,12 +84,10 @@ public class GameHandler {
         return gameOver;
     }
 
-    public synchronized void sendMaze(Socket socket, byte[] mazeBytes) throws IOException {
-        try (OutputStream os = socket.getOutputStream()) {
-            os.write(intToByteArray(mazeBytes.length));
-            os.write(mazeBytes);
-            os.flush();
-        }
+    public void sendMaze(Socket socket, byte[] mazeData) throws IOException {
+        String base64Data = Base64.getEncoder().encodeToString(mazeData);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        out.println(base64Data);
     }
     private byte[] intToByteArray(int value) {
         return new byte[]{
@@ -103,16 +102,11 @@ public class GameHandler {
         if (turnTimer != null) {
             turnTimer.cancel();
         }
-
-        logger.info("Starting turn for Player " + currentPlayerId);
-      /*  logGameState();  // Add state logging*/
-
         turnTimer = new Timer();
         turnTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    logger.info("Turn timer expired for Player " + currentPlayerId);
                     endTurn();
                 } catch (IOException e) {
                     logger.warning("Error ending turn: " + e.getMessage());
@@ -121,11 +115,9 @@ public class GameHandler {
         }, GAME_DURATION_SECONDS);
         // Queue turn notifications
         if (currentPlayerId == 0) {
-            logger.info("Player 0 turn ");
             firstPlayerMessages.put("turn");
             secondPlayerMessages.put("not");
         } else {
-            logger.info("Player 1 turn ");
             secondPlayerMessages.put("turn");
             firstPlayerMessages.put("not");
         }
@@ -161,10 +153,7 @@ public class GameHandler {
     }
 
 
-    public synchronized void addNodeToPath(Node node, int playerId) {
-        logger.info("Received node from Player " + playerId + ": (" + node.getRow() + "," + node.getColumn() + ")");
-
-
+    public synchronized void addNodeToPath(Node node, int playerId) throws InterruptedException {
         Stack<Node> currentPath = (playerId == 0) ? firstPath : secondPath;
         Node previousNode = currentPath.peek();
         if (previousNode.getRow() == node.getRow() && previousNode.getColumn() == node.getColumn()) {
@@ -175,81 +164,71 @@ public class GameHandler {
 
         if(playerId == 0) {
             firstPlayerScore = mazeSolver.updateScore(firstPath.stream().toList(), mazeGen, firstFoundWords, firstPlayerScore);
+            sendScores(firstPlayerMessages,secondPlayerMessages,firstPlayerScore);
         } else if (playerId == 1) {
             secondPlayerScore = mazeSolver.updateScore(secondPath.stream().toList(), mazeGen, secondFoundWords, secondPlayerScore);
+            sendScores(secondPlayerMessages,firstPlayerMessages,secondPlayerScore);
         }
+        logger.info("Player " + playerId + " moved to " + node.getRow() + "," + node.getColumn());
         logger.info("Player 0 score: " + firstPlayerScore);
         logger.info("Player 1 score: " + secondPlayerScore);
-
-        logger.info("Player " + playerId + " moved to " + node.getRow() + "," + node.getColumn());
         try {
-            logger.info("Broadcasting node " + node.getRow() + "," + node.getColumn());
-            broadcastNode(1-playerId, node);
+            broadcastNode(playerId, node);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
         if (node.getRow() == mazeGen.getEnd().getRow() &&
                 node.getColumn() == mazeGen.getEnd().getColumn()) {
-            handleGameEnd(playerId);
-        } else {
-            try {
-                endTurn();
-            } catch (IOException e) {
-                logger.warning("Error ending turn after move: " + e.getMessage());
-            }
+            handleGameEnd();
         }
-
-        /*// Log state again after all updates are complete
-        logger.info("After processing node:");
-        logGameState();*/
     }
 
-    /*public synchronized void logGameState() {
-        logger.info("=== Game State ===");
-        logger.info("First path size: " + firstPath.size());
-        logger.info("Second path size: " + secondPath.size());
-        logger.info("================");
-    }
-*/
-
-
-    private void handleGameEnd(int winningPlayerId) {
+    private void handleGameEnd() throws InterruptedException {
+        int winningPlayerId;
         setGameOver(true);
         if (turnTimer != null) {
             turnTimer.cancel();
             turnTimer = null;
         }
-        logger.info("Game Over: " + gameOver);
         List<Node> shortestPath = mazeSolver.getShortestPath(mazeGen.getMaze(),nbRow,nbCol,mazeGen.getStart(),mazeGen.getEnd());
         List<Node> firstPlayerPath=firstPath.stream().toList();
         List<Node> secondPlayerPath=secondPath.stream().toList();
-        if(firstPlayerPath.size()!=secondPlayerPath.size()){
-            if(shortestPath.size()==firstPlayerPath.size()){
-                winningPlayerId=0;
-                firstPlayerScore+=100;
-            }else if(shortestPath.size()==secondPlayerPath.size()){
-                winningPlayerId=1;
-                secondPlayerScore+=100;
+        boolean firstReachedLastNode=firstPath.peek().getRow()==mazeGen.getEnd().getRow() && firstPath.peek().getColumn()==mazeGen.getEnd().getColumn();
+        boolean secondReachedLastNode=secondPath.peek().getRow()==mazeGen.getEnd().getRow() && secondPath.peek().getColumn()==mazeGen.getEnd().getColumn();
+            if(firstReachedLastNode ){
+                firstPlayerScore+=5;
+                if(shortestPath.size()==firstPlayerPath.size()){
+                    firstPlayerScore+=10;
+                }
+                sendScores(firstPlayerMessages,secondPlayerMessages,firstPlayerScore);
             }
-            logger.info("Player " + winningPlayerId + " won with score : "+ (winningPlayerId==0?firstPlayerScore:secondPlayerScore));
-        }else{
-            logger.info("Player " + winningPlayerId + " won with score : "+ (Math.max(firstPlayerScore, secondPlayerScore)));
-        }
+            if(secondReachedLastNode){
+                secondPlayerScore+=5;
+                if(shortestPath.size()==secondPlayerPath.size()){
+                    secondPlayerScore+=10;
 
-        try {
-            if (winningPlayerId == 0) {
-                firstPlayerMessages.put("win");
-                secondPlayerMessages.put("lose");
-            } else {
-                secondPlayerMessages.put("win");
-                firstPlayerMessages.put("lose");
+                }
+                sendScores(secondPlayerMessages,firstPlayerMessages,secondPlayerScore);
             }
+            winningPlayerId=firstPlayerScore>secondPlayerScore?0:1;
+            logger.info("Player " + winningPlayerId + " won with score : "+ (Math.max(firstPlayerScore, secondPlayerScore)));
+        try {
+           firstPlayerMessages.put("gameOver");
+           secondPlayerMessages.put("gameOver");
+           logger.info("Game Over: " + gameOver);
         } catch (InterruptedException e) {
             logger.warning("Error sending game end messages: " + e.getMessage());
         }
     }
 
+
+    synchronized  void sendScores(BlockingQueue<String> player,BlockingQueue<String> opponent,int playerScore) throws InterruptedException {
+        player.put("score");
+        player.put(String.valueOf(playerScore));
+        opponent.put("otherScore");
+        opponent.put(String.valueOf(playerScore));
+    }
 
 
 }

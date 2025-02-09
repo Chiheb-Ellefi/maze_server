@@ -35,6 +35,16 @@ public abstract class Maze {
        for (String word : this.dictionary) {
            dictionaryLower.add(word.toLowerCase());
        }
+       for(int i=0;i<dictionary.size()/2;i++){
+           int wordLen= random.nextInt(3)+2;
+           StringBuilder wordBuilder= new StringBuilder();
+           for(int j=0;j<wordLen;j++){
+               wordBuilder.append((char) (random.nextInt(26) + 'A'));
+           }
+           int index= random.nextInt(dictionary.size());
+           this.dictionary.add(index,wordBuilder.toString().toLowerCase());
+
+       }
     }
     public Node getStart() {
         return start;
@@ -118,7 +128,7 @@ public abstract class Maze {
         }
     }
     public void createLoops() {
-        int numberOfLoops=(int)(nbRow*nbColumn*0.2);
+        int numberOfLoops=(int)(nbRow*nbColumn*0.4);
         int loopsCreated = 0;
         while (loopsCreated < numberOfLoops) {
             int col = random.nextInt(nbColumn);
