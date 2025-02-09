@@ -1,6 +1,7 @@
 
 FROM openjdk:21-jdk-slim
+
 WORKDIR /app
-COPY /target/maze_final-1.0-SNAPSHOT.jar /app/server.jar
+COPY /target /app
 EXPOSE 5000
-CMD ["java", "-jar", "server.jar"]
+CMD ["java", "-jar", "maze_final-1.0-SNAPSHOT.jar"]
