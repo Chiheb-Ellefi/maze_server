@@ -1,11 +1,12 @@
 # Build stage
-FROM maven:3.8-openjdk-21-slim AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package
 
-FROM openjdk:21-jdk-slim
+# Run stage
+FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar server.jar
 EXPOSE 5000
