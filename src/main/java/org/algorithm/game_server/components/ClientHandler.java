@@ -121,6 +121,9 @@ public class ClientHandler implements Runnable {
                         case "column":
                             out.println(gameHandler.getNbCol());
                             break;
+                        case "theme":
+                            out.println(gameHandler.getTheme());
+                            break;
                         case "maze":
                             gameHandler.sendMaze(clientSocket, gameHandler.getMazeGen().serializeMaze());
                             clientsInitialized = true;

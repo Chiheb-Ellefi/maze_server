@@ -14,6 +14,7 @@ public class MazePopulator {
     private final SimpleModule module;
     private final List<String> themes;
     private final Random random;
+    private  String  wordTheme;
 
     public MazePopulator() {
         this.mapper = new ObjectMapper();
@@ -24,6 +25,14 @@ public class MazePopulator {
         this.mapper.registerModule(module);
     }
 
+    public String getWordTheme() {
+        return wordTheme;
+    }
+
+    public void setWordTheme(String wordTheme) {
+        this.wordTheme = wordTheme;
+    }
+
     public List<String> getData() {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("dictionary.json")) {
             if (inputStream == null) {
@@ -32,6 +41,7 @@ public class MazePopulator {
 
             WordData wordData = mapper.readValue(inputStream, WordData.class);
             String theme = themes.get(random.nextInt(themes.size()));
+            setWordTheme(theme);
             return wordData.getWords().getOrDefault(theme, List.of());
         } catch (IOException e) {
             e.printStackTrace();

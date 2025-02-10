@@ -46,6 +46,9 @@ public abstract class Maze {
 
        }
     }
+    public String getTheme(){
+       return mazePopulator.getWordTheme();
+    }
     public Node getStart() {
         return start;
     }
