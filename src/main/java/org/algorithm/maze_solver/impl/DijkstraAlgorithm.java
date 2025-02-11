@@ -40,47 +40,34 @@ public class DijkstraAlgorithm implements MazeSolver {
         Cell start = new Cell(startNode.getRow(), startNode.getColumn(), 0);
         Cell end = new Cell(endNode.getRow(), endNode.getColumn(), 0);
 
-        // Initialize distance array
         int[][] dist = new int[nbRow][nbColumn];
         initDist(dist);
         dist[start.row][start.col] = 0;
-
-        // Priority queue for Dijkstra's algorithm
         PriorityQueue<Cell> pq = new PriorityQueue<>();
         pq.add(start);
 
-        // Map to store the parent of each cell for path reconstruction
         Map<Cell, Cell> parentMap = new HashMap<>();
 
-        // Directions for 8 possible movements
         int[] dRow = {-1, -1, -1, 0, 1, 1, 1, 0};
         int[] dCol = {-1, 0, 1, 1, 1, 0, -1, -1};
 
         while (!pq.isEmpty()) {
             Cell current = pq.poll();
-
-            // If the current cell is the end cell, reconstruct the path
             if (current.row == end.row && current.col == end.col) {
                 return reconstructPath(parentMap, current, maze);
             }
-
-            // Process neighbors in all 8 directions
             for (int i = 0; i < 8; i++) {
                 int newRow = current.row + dRow[i];
                 int newCol = current.col + dCol[i];
-
-                // Check if the new cell is within bounds
                 if (newRow >= 0 && newRow < nbRow && newCol >= 0 && newCol < nbColumn && maze[newRow][newCol].getValue()!='#') {
                     boolean isPossible = possibleMove(dRow[i], dCol[i], maze[current.row][current.col].getBorders(), maze[newRow][newCol].getBorders());
                     if (isPossible) {
                         int newDist = current.dist + 1;
-
-                        // If a shorter path is found, update the distance and add to the queue
                         if (newDist < dist[newRow][newCol]) {
                             dist[newRow][newCol] = newDist;
                             Cell neighbor = new Cell(newRow, newCol, newDist);
                             pq.add(neighbor);
-                            parentMap.put(neighbor, current); // Track the parent
+                            parentMap.put(neighbor, current);
                         }
                     }
                 }
