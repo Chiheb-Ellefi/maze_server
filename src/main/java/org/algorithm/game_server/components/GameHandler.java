@@ -4,7 +4,6 @@ import org.algorithm.components.Node;
 import org.algorithm.game_server.server.ServerImpl;
 import org.algorithm.maze.Maze;
 import org.algorithm.maze.impl.dfs_algorithm.DfsAlgorithm;
-import org.algorithm.maze.impl.prims_algorithm.PrimsAlgorithm;
 import org.algorithm.maze_solver.MazeSolver;
 import org.algorithm.maze_solver.impl.DijkstraAlgorithm;
 
@@ -30,7 +29,7 @@ public class GameHandler {
     Set<String> firstFoundWords;
     Set<String> secondFoundWords;
     int secondPlayerScore;
-    private String theme;
+    private final String theme;
     private static final int GAME_DURATION_SECONDS = 20000;
     private final BlockingQueue<String> firstPlayerMessages = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> secondPlayerMessages = new LinkedBlockingQueue<>();
@@ -93,15 +92,9 @@ public class GameHandler {
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
         out.println(base64Data);
     }
-    private byte[] intToByteArray(int value) {
-        return new byte[]{
-                (byte) (value >> 24),
-                (byte) (value >> 16),
-                (byte) (value >> 8),
-                (byte) value
-        };
-    }
-    // Update startTurn() in GameHandler to include more logging
+
+
+
     public synchronized void startTurn() throws InterruptedException {
         if (turnTimer != null) {
             turnTimer.cancel();
@@ -117,7 +110,7 @@ public class GameHandler {
                 }
             }
         }, GAME_DURATION_SECONDS);
-        // Queue turn notifications
+
         if (currentPlayerId == 0) {
             firstPlayerMessages.put("turn");
             secondPlayerMessages.put("not");
