@@ -46,9 +46,12 @@ public abstract class Maze {
 
        }
     }
-    public String getTheme(){
-       return mazePopulator.getWordTheme();
+    public String getTheme() {
+        String theme = mazePopulator.getWordTheme();
+        System.out.println("Retrieved theme: " + theme);
+        return theme;
     }
+
     public Node getStart() {
         return start;
     }

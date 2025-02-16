@@ -29,9 +29,7 @@ public class MazePopulator {
         return wordTheme;
     }
 
-    public void setWordTheme(String wordTheme) {
-        this.wordTheme = wordTheme;
-    }
+
 
     public List<String> getData() {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("dictionary.json")) {
@@ -41,7 +39,7 @@ public class MazePopulator {
 
             WordData wordData = mapper.readValue(inputStream, WordData.class);
             String theme = themes.get(random.nextInt(themes.size()));
-            setWordTheme(theme);
+           wordTheme=theme;
             return wordData.getWords().getOrDefault(theme, List.of());
         } catch (IOException e) {
             e.printStackTrace();

@@ -25,8 +25,8 @@ public class ServerImpl implements Server {
     public ServerImpl(int port) {
         this.port = port;
         this.queue = new ConcurrentLinkedQueue<>();
-        this.nbRow = 5;
-        this.nbCol = 10;
+        this.nbRow = 15;
+        this.nbCol = 30;
         this.logger = Logger.getLogger(ServerImpl.class.getName());
         this.executorService = Executors.newCachedThreadPool();
     }

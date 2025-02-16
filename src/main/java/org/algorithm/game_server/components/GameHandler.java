@@ -29,7 +29,7 @@ public class GameHandler {
     Set<String> firstFoundWords;
     Set<String> secondFoundWords;
     int secondPlayerScore;
-    private final String theme;
+
     private static final int GAME_DURATION_SECONDS = 20000;
     private final BlockingQueue<String> firstPlayerMessages = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> secondPlayerMessages = new LinkedBlockingQueue<>();
@@ -42,7 +42,6 @@ public class GameHandler {
         this.mazeGen.setStartAndEnd();
         this.mazeGen.generateMaze();
         this.mazeGen.createLoops();
-        this.theme=mazeGen.getTheme();
         this.logger = Logger.getLogger(ServerImpl.class.getName());
         this.firstPath=new Stack<>();
         this.secondPath=new Stack<>();
@@ -64,7 +63,7 @@ public class GameHandler {
 
 
     public String getTheme() {
-            return theme;
+            return mazeGen.getTheme();
     }
 
     public Maze getMazeGen() {
