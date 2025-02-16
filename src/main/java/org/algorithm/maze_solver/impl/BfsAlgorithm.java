@@ -65,7 +65,7 @@ public class BfsAlgorithm implements MazeSolver {
             }
         }
 
-        // Ajout des logs pour les nouveaux mots trouvés
+
         for (String word : newWords) {
             int points = word.length();
             score += points;

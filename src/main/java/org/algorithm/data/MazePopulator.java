@@ -2,6 +2,8 @@ package org.algorithm.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.algorithm.game_server.components.GameHandler;
+import org.algorithm.visualizer.MazeVisualizer;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -14,7 +16,7 @@ public class MazePopulator {
     private final SimpleModule module;
     private final List<String> themes;
     private final Random random;
-    private  String  wordTheme;
+
 
     public MazePopulator() {
         this.mapper = new ObjectMapper();
@@ -23,11 +25,9 @@ public class MazePopulator {
         this.random = new Random();
         this.module.addDeserializer(WordData.class, new WordDataDeserializer());
         this.mapper.registerModule(module);
+
     }
 
-    public String getWordTheme() {
-        return wordTheme;
-    }
 
 
 
@@ -39,7 +39,9 @@ public class MazePopulator {
 
             WordData wordData = mapper.readValue(inputStream, WordData.class);
             String theme = themes.get(random.nextInt(themes.size()));
-           wordTheme=theme;
+
+           GameHandler.theme =theme;
+            MazeVisualizer.themeProperty.set(theme);
             return wordData.getWords().getOrDefault(theme, List.of());
         } catch (IOException e) {
             e.printStackTrace();

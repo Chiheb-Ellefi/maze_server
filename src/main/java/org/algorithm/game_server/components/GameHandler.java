@@ -29,6 +29,7 @@ public class GameHandler {
     Set<String> firstFoundWords;
     Set<String> secondFoundWords;
     int secondPlayerScore;
+   public static String theme;
 
     private static final int GAME_DURATION_SECONDS = 20000;
     private final BlockingQueue<String> firstPlayerMessages = new LinkedBlockingQueue<>();
@@ -63,7 +64,7 @@ public class GameHandler {
 
 
     public String getTheme() {
-            return mazeGen.getTheme();
+            return theme;
     }
 
     public Maze getMazeGen() {
