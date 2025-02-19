@@ -3,7 +3,6 @@ package org.algorithm.game_server.server;
 import org.algorithm.game_server.components.ClientHandler;
 import org.algorithm.game_server.components.GameHandler;
 import org.algorithm.game_server.utils.Utilities;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -63,8 +62,8 @@ public class ServerImpl implements Server {
         return Utilities.createSessionID(firstIp, secondIp);
     }
 
-    // In ServerImpl.java
-    public void handleGame() throws IOException {
+
+    public void handleGame()  {
         ClientHandler firstClient = queue.poll();
         ClientHandler secondClient = queue.poll();
         if (firstClient == null || secondClient == null) {
