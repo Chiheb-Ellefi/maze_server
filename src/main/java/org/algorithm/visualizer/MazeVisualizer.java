@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.algorithm.components.Node;
-import org.algorithm.maze.Maze;
+
 import org.algorithm.maze.impl.prims_algorithm.PrimsAlgorithm;
 import org.algorithm.maze_solver.MazeSolver;
 import org.algorithm.maze_solver.impl.BfsAlgorithm;
