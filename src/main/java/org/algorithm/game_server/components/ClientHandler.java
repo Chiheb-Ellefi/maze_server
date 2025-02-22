@@ -30,9 +30,6 @@ public class ClientHandler implements Runnable {
         this.clientId = clientId;
     }
 
-    public int getClientId() {
-        return clientId;
-    }
 
     public boolean isClientsInitialized() {
         return clientsInitialized;
@@ -46,13 +43,7 @@ public class ClientHandler implements Runnable {
         return clientSocket;
     }
 
-    public BufferedReader getIn() {
-        return in;
-    }
 
-    public PrintWriter getOut() {
-        return out;
-    }
     @Override
     public void run() {
         try {
@@ -64,7 +55,7 @@ public class ClientHandler implements Runnable {
 
             while (running && !Thread.currentThread().isInterrupted()) {
                 try {
-                    String message = messageQueue.take(); // Changed from poll() to take()
+                    String message = messageQueue.take();
                     outgoingMessages.put(message);
                     if (message.equals("node")) {
                         Node node = nodeQueue.poll();
@@ -96,7 +87,7 @@ public class ClientHandler implements Runnable {
                         logger.info("Sent message to client " + clientId + ": " + message);
                     } catch (Exception e) {
                         logger.warning("Failed to send message to client " + clientId + ": " + e.getMessage());
-                        // Put the message back in the queue if sending failed
+
                         outgoingMessages.put(message);
                         break;
                     }

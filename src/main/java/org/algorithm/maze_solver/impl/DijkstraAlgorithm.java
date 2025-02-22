@@ -114,7 +114,7 @@ public class DijkstraAlgorithm implements MazeSolver {
             }
         }
 
-        // Ajout des logs pour les nouveaux mots trouvés
+
         for (String word : newWords) {
             int points = word.length();
             score += points;
@@ -122,7 +122,7 @@ public class DijkstraAlgorithm implements MazeSolver {
             System.out.println("Mot trouvé: \"" + word + "\" (" + points + " points)");
         }
 
-        // Log du total des points
+
         if (!newWords.isEmpty()) {
             System.out.println("Total gagné ce tour: " + newWords.stream().mapToInt(String::length).sum() + " points");
         }
@@ -192,13 +192,12 @@ public class DijkstraAlgorithm implements MazeSolver {
         List<Node> path = new ArrayList<>();
         Cell current = endCell;
 
-        // Backtrack from the end cell to the start cell using the parent map
         while (current != null) {
             path.add(maze[current.row][current.col]);
             current = parentMap.get(current);
         }
 
-        // Reverse the path to get it from start to end
+
         Collections.reverse(path);
         return path;
     }

@@ -55,10 +55,6 @@ public class ServerImpl implements Server {
 
     @Override
     public String createSession(String firstIp, String secondIp) {
-        ClientHandler firstClient = queue.poll();
-        ClientHandler secondClient = queue.poll();
-        assert firstClient != null;
-        assert secondClient != null;
         return Utilities.createSessionID(firstIp, secondIp);
     }
 
@@ -85,7 +81,6 @@ public class ServerImpl implements Server {
         executorService.submit(firstClient);
         executorService.submit(secondClient);
 
-        // Wait for both clients to initialize before starting the game
         Thread initializationChecker = new Thread(() -> {
             while (!firstClient.isClientsInitialized() || !secondClient.isClientsInitialized()) {
                 try {
