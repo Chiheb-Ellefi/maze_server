@@ -38,7 +38,7 @@ public class MazeVisualizer extends Application {
     private static final int CELL_SIZE = 50;
     private static final int MAZE_WIDTH = 37;
     private static final int MAZE_HEIGHT = 15;
-    private static final int TURN_TIME = 20;
+    private static final int TURN_TIME = 60;
     private Pane mazePane;
     private Arc player;
     private int playerRow;
@@ -81,7 +81,6 @@ public class MazeVisualizer extends Application {
          mazeGenerator = new PrimsAlgorithm(MAZE_HEIGHT, MAZE_WIDTH);
         mazeGenerator.setStartAndEnd();
         mazeGenerator.generateMaze();
-        //mazeGenerator.createLoops();
         mazeGenerator.populateThisMaze();
         solver=new BfsAlgorithm();
         maze = mazeGenerator.getMaze();
@@ -415,7 +414,6 @@ public class MazeVisualizer extends Application {
          mazeGenerator = new PrimsAlgorithm(MAZE_HEIGHT, MAZE_WIDTH);
         mazeGenerator.setStartAndEnd();
         mazeGenerator.generateMaze();
-       // mazeGenerator.createLoops();
         mazeGenerator.populateThisMaze();
         solver=new BfsAlgorithm();
         maze = mazeGenerator.getMaze();

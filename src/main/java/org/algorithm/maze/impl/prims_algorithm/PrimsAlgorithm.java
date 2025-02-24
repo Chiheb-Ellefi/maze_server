@@ -25,7 +25,7 @@ private List<List<Node>> paths;
         frontier.add(current);
         do {
             current = frontier.get(random.nextInt(frontier.size()));
-            maze[current.getRow()][current.getColumn()].setValue((char) (random.nextInt(26) + 'A'));
+        /*    maze[current.getRow()][current.getColumn()].setValue((char) (random.nextInt(26) + 'A'));*/
             maze[current.getRow()][current.getColumn()].setPartOfMaze(true);
             List<Node> visitedNeighbors = getVisitedNeighbors(getNeighbors(current));
             if (!visitedNeighbors.isEmpty()) {
@@ -48,7 +48,7 @@ private List<List<Node>> paths;
     public void  populateThisMaze(){
         int nb=0;
         int index=0;
-        String word=dictionary.get(nb);
+        String word=defaultDictionary.get(nb);
         paths=solver.getAllPaths(maze,nbRow,nbColumn,start,end);
         System.out.println("all paths"+paths.size());
         for (List<Node> path : paths) {
