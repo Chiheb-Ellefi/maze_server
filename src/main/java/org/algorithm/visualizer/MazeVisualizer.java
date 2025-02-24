@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -27,6 +28,7 @@ import org.algorithm.maze.impl.prims_algorithm.PrimsAlgorithm;
 import org.algorithm.maze_solver.MazeSolver;
 import org.algorithm.maze_solver.impl.BfsAlgorithm;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
@@ -36,7 +38,7 @@ public class MazeVisualizer extends Application {
     private static final int CELL_SIZE = 50;
     private static final int MAZE_WIDTH = 37;
     private static final int MAZE_HEIGHT = 15;
-
+    private static final int TURN_TIME = 20;
     private Pane mazePane;
     private Arc player;
     private int playerRow;
@@ -47,17 +49,20 @@ public class MazeVisualizer extends Application {
     private Rectangle[][] cellRectangles;
     private Button[] controlButtons;
     private Label scoreLabel;
+    private Label timeLabel;
     private int currentScore = 0;
     private Rectangle[][] playerPathCells;
     private Arc pacmanArc;
     private Timeline pacmanAnimation;
     private AudioClip wakawaka;
+    private  Timer timer;
+    private int timeRemaining;
     private AudioClip victory;
+    private AudioClip lose;
     private AudioClip gameStart;
     private AudioClip bonus;
     private boolean mouthOpen = true;
     private Stack<Node> currentPath;
-   public  static String theme;
     private MazeSolver solver;
     private static final Color BACKGROUND_COLOR = Color.web("#000000");
     private static final Color WALL_COLOR = Color.web("#2121DE");
@@ -68,7 +73,7 @@ public class MazeVisualizer extends Application {
     private  PrimsAlgorithm mazeGenerator;
     // In MazeVisualizer
     public static final StringProperty themeProperty = new SimpleStringProperty("");
-
+    private boolean gameRunning = true;
     Set<String> foundWords;
     @Override
     public void init() throws Exception {
@@ -90,10 +95,51 @@ public class MazeVisualizer extends Application {
         gameStart = new AudioClip(getClass().getResource("/sounds/game_start.wav").toExternalForm());
         victory = new AudioClip(getClass().getResource("/sounds/victory.wav").toExternalForm());
         bonus = new AudioClip(getClass().getResource("/sounds/bonus.wav").toExternalForm());
+        lose=new AudioClip(getClass().getResource("/sounds/death.wav").toExternalForm());
 
         initializePacmanAnimation();
+        initializeTimer();
+    }
+    private void initializeTimer() {
+        timer = new Timer(1000, e -> {
+            if (timeRemaining > 0) {
+                timeRemaining--;
+                Platform.runLater(() -> updateTimeLabel());
+            } else {
+                gameRunning = false;
+                timer.stop();
+                pacmanAnimation.stop();
+                Platform.runLater(() -> {
+                    lose.play();
+                    disableControls();
+                    showLoseAlert(currentScore);
+                });
+            }
+        });
+        timer.start();
+    }
+    private void disableControls() {
+        for (Button button : controlButtons) {
+            button.setDisable(true);
+        }
     }
 
+    // Add method to enable controls
+    private void enableControls() {
+        for (Button button : controlButtons) {
+            button.setDisable(false);
+        }
+    }
+    private void updateTimeLabel() {
+        if (timeLabel != null) {
+            timeLabel.setText("Time: " + timeRemaining);
+            if (timeRemaining <= 5) {
+                timeLabel.setTextFill(Color.RED);
+            } else {
+                timeLabel.setTextFill(Color.WHITE);
+            }
+        }
+    }
     private void initializePacmanAnimation() {
         pacmanArc = new Arc(0, 0, PLAYER_SIZE, PLAYER_SIZE, 45, 270);
         pacmanArc.setFill(PLAYER_COLOR);
@@ -156,9 +202,11 @@ public class MazeVisualizer extends Application {
                         themeProperty
                 )
         );
+        timeLabel = new Label("Time: "+TURN_TIME);
 // Change text as needed
+        styleLabel(timeLabel, arcadeFont);
         styleLabel(themeLabel, arcadeFont);
-        statusBar.getChildren().add(scoreLabel);
+        statusBar.getChildren().addAll(timeLabel,scoreLabel);
         VBox topContainer = new VBox(5, themeLabel, statusBar);
         topContainer.setAlignment(Pos.CENTER);
         root.setTop(topContainer);
@@ -261,6 +309,8 @@ public class MazeVisualizer extends Application {
     }
 
     private void movePlayer(int deltaRow, int deltaCol) {
+        if (!gameRunning) return;  // Don't allow movement if game is not running
+
         int newRow = playerRow + deltaRow;
         int newCol = playerCol + deltaCol;
 
@@ -271,7 +321,7 @@ public class MazeVisualizer extends Application {
             pacmanArc.setRotate(angle);
 
             updatePlayerPosition(newRow, newCol);
-            Node node  = maze[newRow][newCol];
+            Node node = maze[newRow][newCol];
             Node previousNode = currentPath.peek();
             if (previousNode.getRow() == node.getRow() && previousNode.getColumn() == node.getColumn()) {
                 currentPath.pop();
@@ -284,17 +334,12 @@ public class MazeVisualizer extends Application {
                 scoreLabel.setText("Score: " + score);
                 bonus.play();
             }
-            // Check if player reached the end
+
             if (newRow == endNode.getRow() && newCol == endNode.getColumn()) {
+                gameRunning = false;  // Stop the game on victory
                 victory.play();
                 showVictoryAlert(score);
             }
-
-            // Update score
-
-
-
-
         }
     }
 
@@ -361,6 +406,12 @@ public class MazeVisualizer extends Application {
 
     private void regenerateMaze() {
         // Generate new maze
+        gameRunning = true;
+        timeRemaining = TURN_TIME;
+        timer.restart();
+        updateTimeLabel();
+        enableControls();
+        pacmanAnimation.play();
          mazeGenerator = new PrimsAlgorithm(MAZE_HEIGHT, MAZE_WIDTH);
         mazeGenerator.setStartAndEnd();
         mazeGenerator.generateMaze();
@@ -457,6 +508,7 @@ public class MazeVisualizer extends Application {
     }
 
     private void showVictoryAlert(int score) {
+        timer.stop();
         Stage dialogStage = new Stage(StageStyle.TRANSPARENT);
         VBox dialogVbox = new VBox(20);
         dialogVbox.setAlignment(Pos.CENTER);
@@ -508,6 +560,84 @@ public class MazeVisualizer extends Application {
             -fx-background-radius: 5;
             -fx-effect: dropshadow(gaussian, #0000FF, 5, 0.5, 0, 0);
             """);
+        closeButton.setOnAction(e -> dialogStage.close());
+
+        HBox buttonBox = new HBox(20);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.getChildren().addAll(newGameButton, closeButton);
+
+        dialogVbox.getChildren().addAll(titleLabel, messageLabel, scoreLabel, buttonBox);
+
+        Scene dialogScene = new Scene(dialogVbox);
+        dialogScene.setFill(null);
+        dialogStage.setScene(dialogScene);
+
+        // Center the dialog on the screen
+        dialogStage.setOnShown(e -> {
+            Stage mainStage = (Stage) mazePane.getScene().getWindow();
+            dialogStage.setX(mainStage.getX() + (mainStage.getWidth() - dialogStage.getWidth()) / 2);
+            dialogStage.setY(mainStage.getY() + (mainStage.getHeight() - dialogStage.getHeight()) / 2);
+        });
+
+        dialogStage.show();
+    }
+    private void showLoseAlert(int score) {
+        Stage dialogStage = new Stage(StageStyle.TRANSPARENT);
+        VBox dialogVbox = new VBox(20);
+        dialogVbox.setAlignment(Pos.CENTER);
+        dialogVbox.setPadding(new Insets(30));
+        dialogVbox.setStyle("""
+        -fx-background-color: #000000;
+        -fx-border-color: #FF0000;
+        -fx-border-width: 3;
+        -fx-border-radius: 10;
+        -fx-background-radius: 10;
+        -fx-effect: dropshadow(gaussian, #FF0000, 20, 0.5, 0, 0);
+        """);
+
+        Label titleLabel = new Label("TIME'S UP!");
+        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 36));
+        titleLabel.setTextFill(Color.web("#FF0000"));
+        titleLabel.setStyle("-fx-effect: dropshadow(gaussian, #FF0000, 10, 0.7, 0, 0);");
+
+        Label messageLabel = new Label("You ran out of time!");
+        messageLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
+        messageLabel.setTextFill(Color.WHITE);
+
+        Label scoreLabel = new Label(String.format("Final Score: %d", score));
+        scoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        scoreLabel.setTextFill(Color.WHITE);
+
+        Button newGameButton = new Button("Try Again");
+        newGameButton.setStyle("""
+        -fx-background-color: #FF0000;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 16;
+        -fx-padding: 10 20;
+        -fx-background-radius: 5;
+        -fx-effect: dropshadow(gaussian, #FF0000, 5, 0.5, 0, 0);
+        """);
+        newGameButton.setOnAction(e -> {
+            dialogStage.close();
+            gameRunning = true;  // Reset game state
+            timeRemaining = TURN_TIME;
+            enableControls();  // Re-enable controls
+            regenerateMaze();
+            pacmanAnimation.play();  // Restart Pacman animation
+            timer.start();
+        });
+
+        Button closeButton = new Button("Close");
+        closeButton.setStyle("""
+        -fx-background-color: #FF0000;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 16;
+        -fx-padding: 10 20;
+        -fx-background-radius: 5;
+        -fx-effect: dropshadow(gaussian, #FF0000, 5, 0.5, 0, 0);
+        """);
         closeButton.setOnAction(e -> dialogStage.close());
 
         HBox buttonBox = new HBox(20);
