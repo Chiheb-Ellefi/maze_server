@@ -39,8 +39,7 @@ public class MazePopulator {
 
             WordData wordData = mapper.readValue(inputStream, WordData.class);
             String theme = themes.get(random.nextInt(themes.size()));
-
-           GameHandler.theme =theme;
+            GameHandler.theme =theme;
             MazeVisualizer.themeProperty.set(theme);
             return wordData.getWords().getOrDefault(theme, List.of());
         } catch (IOException e) {

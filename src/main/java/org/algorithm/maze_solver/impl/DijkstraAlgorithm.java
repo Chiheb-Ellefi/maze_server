@@ -132,7 +132,6 @@ public class DijkstraAlgorithm implements MazeSolver {
 
     private Node[][] deepCopyMaze(Node[][] original, int nbRow, int nbColumn) {
         Node[][] copy = new Node[nbRow][nbColumn];
-
         for (int i = 0; i < nbRow; i++) {
             for (int j = 0; j < nbColumn; j++) {
                 Node originalNode = original[i][j];

@@ -7,13 +7,13 @@ public class Node implements Serializable {
     private int column;
     private boolean[] borders;
     private char value;
-    private boolean partOfMaze; // New field to track if the node is part of the maze
+    private boolean partOfMaze;
 
     public Node(int row, int column) {
         this.row = row;
         this.column = column;
         this.borders = new boolean[]{true, true, true, true}; // Borders: top, right, bottom, left
-        this.partOfMaze = false; // Initially, the node is not part of the maze
+        this.partOfMaze = false;
 
     }
 

@@ -65,7 +65,6 @@
                  start.setColumn(0);
                  end.setColumn(nbColumn - 1);
                  start.setRow(random.nextInt(nbRow));
-
                  end.setRow(start.getRow()<nbRow/2?random.nextInt(nbRow/2,nbRow):random.nextInt(0,nbRow/2));
              } else {
                  start.setRow(0);

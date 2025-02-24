@@ -22,8 +22,6 @@ private List<List<Node>> paths;
         Node current = start;
         List<Node> frontier = new ArrayList<>();
         current.setPartOfMaze(true);
-
-
         frontier.add(current);
         do {
             current = frontier.get(random.nextInt(frontier.size()));
@@ -50,7 +48,7 @@ private List<List<Node>> paths;
     public void  populateThisMaze(){
         int nb=0;
         int index=0;
-        String word=defaultDictionary.get(nb);
+        String word=dictionary.get(nb);
         paths=solver.getAllPaths(maze,nbRow,nbColumn,start,end);
         System.out.println("all paths"+paths.size());
         for (List<Node> path : paths) {
