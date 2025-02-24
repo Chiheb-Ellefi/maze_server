@@ -38,7 +38,7 @@ public class MazeVisualizer extends Application {
     private static final int CELL_SIZE = 50;
     private static final int MAZE_WIDTH = 37;
     private static final int MAZE_HEIGHT = 15;
-    private static final int TURN_TIME = 60;
+    private static final int TURN_TIME = 30;
     private Pane mazePane;
     private Arc player;
     private int playerRow;

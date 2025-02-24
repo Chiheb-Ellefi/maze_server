@@ -25,7 +25,7 @@ private List<List<Node>> paths;
         frontier.add(current);
         do {
             current = frontier.get(random.nextInt(frontier.size()));
-        /*    maze[current.getRow()][current.getColumn()].setValue((char) (random.nextInt(26) + 'A'));*/
+            maze[current.getRow()][current.getColumn()].setValue((char) (random.nextInt(26) + 'A'));
             maze[current.getRow()][current.getColumn()].setPartOfMaze(true);
             List<Node> visitedNeighbors = getVisitedNeighbors(getNeighbors(current));
             if (!visitedNeighbors.isEmpty()) {
