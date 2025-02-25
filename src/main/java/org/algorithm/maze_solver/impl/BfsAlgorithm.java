@@ -9,7 +9,6 @@ import java.util.*;
 public class BfsAlgorithm implements MazeSolver {
     @Override
     public List<Node> getShortestPath(Node[][] maze, int nbRow, int nbColumn, Node start, Node end) {
-        // TODO: Implement BFS to find the shortest path
         return List.of();
     }
 
