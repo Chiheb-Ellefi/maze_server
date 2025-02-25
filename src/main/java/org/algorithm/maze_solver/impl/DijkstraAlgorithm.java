@@ -6,41 +6,29 @@ import org.algorithm.maze_solver.MazeSolver;
 
 import java.util.*;
 
-/**
- * Implementation of Dijkstra's algorithm to solve mazes.
- * This class provides methods to find the shortest path in a maze and all possible paths.
- */
+
 public class DijkstraAlgorithm implements MazeSolver {
-    /**
-     * Inner class representing a cell in the maze with its position and distance.
-     * Implements Comparable to be used in priority queue for Dijkstra's algorithm.
-     */
+    //Inner class representing a cell in the maze with its position and distance.
+
     static class Cell implements Comparable<Cell> {
         int row, col, dist;
 
-        /**
-         * Constructor for a cell.
-         * @param row Row index in the maze
-         * @param col Column index in the maze
-         * @param dist Distance from the start node
-         */
+
         Cell(int row, int col, int dist) {
             this.row = row;
             this.col = col;
             this.dist = dist;
         }
 
-        /**
-         * Compares cells based on their distance for priority queue ordering.
-         */
+        // Compares cells based on their distance for priority queue ordering.
+
         @Override
         public int compareTo(Cell other) {
             return Integer.compare(this.dist, other.dist);
         }
 
-        /**
-         * Checks if two cells are at the same position (regardless of distance).
-         */
+        //Checks if two cells are at the same position (regardless of distance).
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -49,25 +37,14 @@ public class DijkstraAlgorithm implements MazeSolver {
             return row == cell.row && col == cell.col;
         }
 
-        /**
-         * Generates hashcode for the cell based on its position.
-         */
         @Override
         public int hashCode() {
             return Objects.hash(row, col);
         }
     }
 
-    /**
-     * Finds the shortest path between start and end nodes in the maze using Dijkstra's algorithm.
-     *
-     * @param maze 2D array representing the maze
-     * @param nbRow Number of rows in the maze
-     * @param nbColumn Number of columns in the maze
-     * @param startNode The starting node
-     * @param endNode The destination node
-     * @return List of nodes representing the shortest path, or null if no path exists
-     */
+    //Finds the shortest path between start and end nodes in the maze using Dijkstra's algorithm.
+
     @Override
     public List<Node> getShortestPath(Node[][] maze, int nbRow, int nbColumn, Node startNode, Node endNode) {
         // Create cell objects for start and end positions
@@ -127,36 +104,10 @@ public class DijkstraAlgorithm implements MazeSolver {
         return null;
     }
 
-    /**
-     * Finds all possible paths between start and end nodes.
-     * Repeatedly finds shortest paths and eliminates them from the maze.
-     *
-     * @param maze 2D array representing the maze
-     * @param nbRow Number of rows in the maze
-     * @param nbColumn Number of columns in the maze
-     * @param start The starting node
-     * @param end The destination node
-     * @return List of all possible paths between start and end
-     */
+
     @Override
     public List<List<Node>> getAllPaths(Node[][] maze, int nbRow, int nbColumn, Node start, Node end) {
-        List<List<Node>> paths = new ArrayList<>();
-
-        // Create a deep copy of the maze (not used in the method)
-        Node[][] mazeCopy = deepCopyMaze(maze, nbRow, nbColumn);
-
-        // Find the shortest path
-        List<Node> shortestPath = getShortestPath(maze, nbRow, nbColumn, start, end);
-
-        // Keep finding paths until no more paths exist
-        while (shortestPath != null) {
-            paths.add(shortestPath);
-            // Block the current path by marking intermediate nodes as walls
-            eliminatePath(shortestPath, maze);
-            // Find the next shortest path
-            shortestPath = getShortestPath(maze, nbRow, nbColumn, start, end);
-        }
-        return paths;
+       return List.of();
     }
 
     //Updates the score based on words found in the current path.
@@ -202,30 +153,6 @@ public class DijkstraAlgorithm implements MazeSolver {
         return score;
     }
 
-    // Creates a deep copy of the maze.
-
-    private Node[][] deepCopyMaze(Node[][] original, int nbRow, int nbColumn) {
-        Node[][] copy = new Node[nbRow][nbColumn];
-        for (int i = 0; i < nbRow; i++) {
-            for (int j = 0; j < nbColumn; j++) {
-                Node originalNode = original[i][j];
-                copy[i][j] = new Node(originalNode.getRow(), originalNode.getColumn());
-                copy[i][j].setValue(originalNode.getValue());
-            }
-        }
-        return copy;
-    }
-
-    //Marks the intermediate nodes in a path as walls (#) to eliminate this path.
-
-    private void eliminatePath(List<Node> path, Node[][] maze) {
-        for (int i = 0; i < path.size(); i++) {
-            Node node = path.get(i);
-            if(i!=0 && i!=path.size()-1){
-                maze[node.getRow()][node.getColumn()].setValue('#');
-            }
-        }
-    }
 
     // Initializes distance array with maximum values.
 

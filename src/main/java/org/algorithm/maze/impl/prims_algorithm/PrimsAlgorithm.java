@@ -16,7 +16,7 @@ public class PrimsAlgorithm extends Maze {
 
     public PrimsAlgorithm(int nbRow, int nbColumn) {
         super(nbRow, nbColumn);
-        solver = new BfsAlgorithm(); // Using BFS for path-finding
+        solver = new BfsAlgorithm();
         paths = new ArrayList<>();
     }
 
