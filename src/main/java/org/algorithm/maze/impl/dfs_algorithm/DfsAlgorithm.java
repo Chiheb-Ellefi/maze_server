@@ -13,7 +13,7 @@ public class DfsAlgorithm extends Maze {
 
     @Override
     public void generateMaze() {
-        setStartAndEnd();
+        setStartAndEnd(); // Set the starting and ending points of the maze
         Stack<Node> stack = new Stack<>();
         Stack<Character> injected = new Stack<>();
         Stack<Character> toInject = new Stack<>();
@@ -25,7 +25,7 @@ public class DfsAlgorithm extends Maze {
         char currentChar;
 
         do {
-            if (stack.isEmpty()) {
+            if (stack.isEmpty()) { // Initialize with the starting node
                 current = maze[start.getRow()][start.getColumn()];
                 currentChar = currentWord.charAt(index);
                 injected.push(currentChar);
@@ -38,7 +38,7 @@ public class DfsAlgorithm extends Maze {
             }
 
             List<Node> unvisitedNeighbors = getUnvisitedNeighbors(getNeighbors(maze[current.getRow()][current.getColumn()]));
-            if (!unvisitedNeighbors.isEmpty()) {
+            if (!unvisitedNeighbors.isEmpty()) { // Move to an unvisited neighbor
                 Node nextCell = unvisitedNeighbors.get(random.nextInt(unvisitedNeighbors.size()));
                 removeWallBetween(current, nextCell);
                 stack.push(nextCell);
@@ -54,21 +54,21 @@ public class DfsAlgorithm extends Maze {
                 }
                 injected.push(currentChar);
                 current.setValue(currentChar);
-            } else {
+            } else { // Backtrack when no unvisited neighbors remain
                 current = stack.pop();
                 currentChar = injected.pop();
                 toInject.push(currentChar);
             }
 
-
-            if(word < dictionary.size() - 1){
-                if (index == currentWord.length()  ) {
+            // Switch to the next word if needed
+            if (word < dictionary.size() - 1) {
+                if (index == currentWord.length()) {
                     word++;
                     currentWord = dictionary.get(word);
                     index = 0;
                 }
-            }else{
-                dictionary=mazePopulator.getData();
+            } else { // If all words are used, repopulate the dictionary
+                dictionary = mazePopulator.getData();
             }
 
         } while (!stack.isEmpty());
