@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-public class ServerImpl implements Server {
+public class ServerImpl  {
     private ServerSocket server;
     private final int port;
     private Queue<ClientHandler> queue;
@@ -53,7 +53,7 @@ public class ServerImpl implements Server {
         server.close();
     }
 
-    @Override
+
     public String createSession(String firstIp, String secondIp) {
         return Utilities.createSessionID(firstIp, secondIp);
     }
@@ -77,7 +77,7 @@ public class ServerImpl implements Server {
                 secondClient.getClientSocket().getRemoteSocketAddress().toString()
         );
         logger.info("Session created: " + sessionId);
-
+        logger.info("Game started! Client1: " + firstClient.getClientSocket().getRemoteSocketAddress().toString() + " Client2: " + secondClient.getClientSocket().getRemoteSocketAddress().toString() );
         executorService.submit(firstClient);
         executorService.submit(secondClient);
 
